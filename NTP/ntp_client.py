@@ -1,4 +1,4 @@
-from ntp_client_server import NTPPacket
+from ntp_main_client import NTPPacket
 import time
 import datetime
 import socket

@@ -6,7 +6,7 @@ from socket import socket, AF_INET, SOCK_DGRAM
 import threading
 import copy
 
-from ntp_client_server import NTPPacket
+from ntp_main_client import NTPPacket
 
 
 def time_sender_udp(host='127.0.0.1', port=8888):
