@@ -1,0 +1,23 @@
+ntp_sender_simple.py -
+
+    Takes current time from NTP-server and working in two threads:
+        1) Printing current time 1 time in 5 seconds;
+        2) Starting UDP-server and sending current time like string to clients.
+
+ntp_client_simple.py -
+
+    Works with ntp_sender_simple.py.
+
+ntp_main_client.py -
+
+    Determines NTPPacket class and taking real time from NTP-server.
+
+ntp_sender.py -
+
+    Starts server on host:port,
+    takes NTPPacket from client,
+    sends NTPPacket back to client with necessary information for synchronize time with client.
+
+ntp_client.py -
+
+    Works with ntp_sender.py.

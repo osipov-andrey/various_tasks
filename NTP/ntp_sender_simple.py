@@ -1,5 +1,7 @@
 '''
-solution without using dependencies, only UDP but mostly
+Takes current time from NTP-server and works in two threads:
+    1) Printing current time 1 time in 5 seconds;
+    2) Starting UDP-server and sending current time like string to clients.
 '''
 # !/usr/bin/env python
 
