@@ -1,8 +1,10 @@
-from ntp_main_client import NTPPacket
 import time
 import datetime
 import socket
 from contextlib import closing
+
+from ntp_main_client import NTPPacket
+from read_config import read_Config
 
 
 def time_client_udp(host='127.0.0.1', port=8888):
@@ -22,7 +24,8 @@ def time_client_udp(host='127.0.0.1', port=8888):
 
 
 if __name__ == '__main__':
-    time_client_udp()
+    print(read_Config("ntp_conf.json"))
+    time_client_udp(read_Config("ntp_conf.json")['client']['host'], read_Config("ntp_conf.json")['client']['port'])
 
 
 

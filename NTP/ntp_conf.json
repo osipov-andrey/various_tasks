@@ -1,0 +1,11 @@
+{
+"client": {
+  "name": "NTP Client ver. 0.1",
+  "host": "127.0.0.1",
+  "port": 5554
+},
+"server": {
+  "name": "NTP Server ver. 0.1",
+  "host": "127.0.0.1",
+  "port": 5554
+}}

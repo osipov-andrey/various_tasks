@@ -1,12 +1,14 @@
 import datetime
-import struct
 import time
 from contextlib import closing
 from socket import socket, AF_INET, SOCK_DGRAM
 import threading
-import copy
+import os
+import sys
+import signal
 
 from ntp_main_client import NTPPacket
+from read_config import read_Config
 
 
 def time_sender_udp(host='127.0.0.1', port=8888):
@@ -35,7 +37,21 @@ def time_sender_udp(host='127.0.0.1', port=8888):
 
 
 def main():
-    time_sender_udp()
+    time_sender_udp(read_Config("ntp_conf.json")['server']['host'], read_Config("ntp_conf.json")['server']['port'])
+
+
+def sigint_handler(signum, frame):
+    print('CTRL + C Pressed, program is now stopped!')
+    # os.abort()
+    # raise SystemExit(1)
+    # os.kill(os.getpid(),9)
+    sys.exit(0)
+
+
+# signal.signal(signal.SIGTSTP, sigint_handler) # # Push interrupt implementation CTRL + Z , unix-only
+
+
+signal.signal(signal.SIGINT, sigint_handler)  # # Push interrupt implementation CTRL + C
 
 
 if __name__ == '__main__':

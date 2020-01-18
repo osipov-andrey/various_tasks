@@ -12,6 +12,14 @@ ntp_main_client.py -
 
     Determines NTPPacket class and taking real time from NTP-server.
 
+read_config.py -
+
+    Contains a function, that read json-config.
+
+ntp_conf.json -
+
+    Configuration file for ntp_sender.py and ntp_client.py.
+
 ntp_sender.py -
 
     Starts server on host:port,
