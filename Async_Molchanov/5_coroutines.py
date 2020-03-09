@@ -17,7 +17,7 @@ def subgen():
     print('Subgen recived: ', message)
 
 
-@coroutine
+@coroutine_hand_maid
 def average():
     count = 0
     summ = 0
