@@ -50,4 +50,4 @@ def sync_main():
 
 sync_main()
 event_loop = asyncio.get_event_loop()
-event_loop.run_until_complete(async_main())
+event_loop.run_forever(async_main())
