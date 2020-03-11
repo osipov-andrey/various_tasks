@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<data xmlns="http://example.com/persons"
+      xmlns:olympic="http://example.com/olympic">
+    <person pk="20">
+        <name>Dmitry Petrov</name>
+        <age>23</age>
+        <olympic:name>Dimas</olympic:name>
+        <olympic:field>Development</olympic:field>
+    </person>
+    <person pk="21">
+        <name>Vikor Sidorov</name>
+        <age>29</age>
+        <olympic:name>Malder</olympic:name>
+        <olympic:field>Poems</olympic:field>
+    </person>
+    <person pk="22">
+        <name>Kirill Ivanov</name>
+        <age/>
+        <olympic:name>TechnoGuitar</olympic:name>
+        <olympic:field>Music</olympic:field>
+    </person>
+    <person pk="23">
+        <name>Vlad Belov</name>
+        <age/>
+        <olympic:name>Ray</olympic:name>
+        <olympic:field>Games</olympic:field>
+    </person>
+</data>

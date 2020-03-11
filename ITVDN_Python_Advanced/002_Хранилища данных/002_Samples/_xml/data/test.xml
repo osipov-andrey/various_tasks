@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<data>
+    <person pk="20">
+        <first_name>Dmitry</first_name>
+        <last_name>Petrov</last_name>
+        <age>23</age>
+    </person>
+    <person pk="21">
+        <first_name>Alexey</first_name>
+        <last_name>Sidorov</last_name>
+        <age>29</age>
+    </person>
+    <person pk="22">
+        <first_name>Sergey</first_name>
+        <last_name>Ivanov</last_name>
+        <age/>
+    </person>
+</data>
