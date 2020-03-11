@@ -1,0 +1,8 @@
+2020-03-11 15:37:04,511 - aiohttp_logger - INFO - Start request to https://jsonplaceholder.typicode.com/todos/1
+2020-03-11 15:37:04,519 - aiohttp_logger - INFO - Start request to http://example.com
+2020-03-11 15:37:04,520 - aiohttp_logger - INFO - Start request to https://github.com
+2020-03-11 15:37:04,520 - aiohttp_logger - INFO - Start request to https://jsonplaceholder.typicode.com/posts/1
+2020-03-11 15:37:04,582 - aiohttp_logger - INFO - Takes request with status 200
+2020-03-11 15:37:04,583 - aiohttp_logger - INFO - Takes request with status 200
+2020-03-11 15:37:04,654 - aiohttp_logger - INFO - Takes request with status 200
+2020-03-11 15:37:04,745 - aiohttp_logger - INFO - Takes request with status 200

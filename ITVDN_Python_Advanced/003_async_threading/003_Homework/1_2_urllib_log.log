@@ -1,0 +1,8 @@
+2020-03-11 15:37:04,017 - urllib_logger - INFO - Start request to https://jsonplaceholder.typicode.com/todos/1
+2020-03-11 15:37:04,098 - urllib_logger - INFO - Takes request with status 200
+2020-03-11 15:37:04,098 - urllib_logger - INFO - Start request to http://example.com
+2020-03-11 15:37:04,318 - urllib_logger - INFO - Takes request with status 200
+2020-03-11 15:37:04,318 - urllib_logger - INFO - Start request to https://github.com
+2020-03-11 15:37:04,444 - urllib_logger - INFO - Takes request with status 200
+2020-03-11 15:37:04,445 - urllib_logger - INFO - Start request to https://jsonplaceholder.typicode.com/posts/1
+2020-03-11 15:37:04,510 - urllib_logger - INFO - Takes request with status 200
