@@ -9,9 +9,11 @@ class User:
 
 
 def create_new_user(first_name, last_name):
+    # неоднозначность типов и преобразований
+    # first_name.???
     print(first_name)
     return User(first_name=first_name, last_name=last_name)
 
 
-user1 = create_new_user(value, value)
-user2 = create_new_user(str(value), str(value))
+# user1 = create_new_user(value, value)
+user2 = create_new_user('Test1', 'Test2')
