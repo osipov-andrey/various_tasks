@@ -7,14 +7,16 @@ from uasyncio import sleep, sleep_ms, get_event_loop
 from ucollections import namedtuple
 
 ##################     RFID-READER SETTINGS     ##################
-sse_host = "10.10.0.1"
+sse_host = "192.168.10.118"
 sse_port = 5000
-picoweb_debug = True
+picoweb_debug = False
 message_to_client = "event: card\ndata: {}\n\n"
 app = picoweb.WebApp("__name__")
 wdt = WDT(timeout=30000)
 buz = Buzzer()
 rfid = RFID()
+
+
 ##################     ####################     ##################
 
 
@@ -186,7 +188,7 @@ async def subscribe(req, resp):
 
     try:
         async for data in subscriber_aiterator:
-            print("DATA: ", data)
+            print(message_to_client.format(data))
 
             try:
                 await resp.awrite(message_to_client.format(data))
@@ -233,6 +235,18 @@ async def hello(req, resp):
     </body>
 </html>
 """
+
+    await picoweb.start_response(resp)
+    await resp.awrite(response)
+
+
+@app.route("/id")
+async def send_pseudo_id(req, resp):
+    response = "B65BBC19"
+    if req.qs:
+        response = req.qs
+    # await sleep(3)
+    publisher.publish(response)  # Message to already connected clients
 
     await picoweb.start_response(resp)
     await resp.awrite(response)
