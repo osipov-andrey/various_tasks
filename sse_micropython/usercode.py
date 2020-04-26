@@ -62,6 +62,8 @@ class Queue:
 
     async def put(self, val):
         """Usage: await queue.put(item)"""
+        print("QUEUE SELF SIZE: {}".format(self.qsize()))
+        print("QUEUE SELF ID: {}".format(id(self)))
         while self.qsize() >= self.maxsize and self.maxsize:
             # Queue full
             await sleep_ms(0)
@@ -153,27 +155,26 @@ class Publisher:
     def unsubscribe(self, subscriber_id, channel='default channel'):
         """ Finds subscriber by his ID end removes him from subscribers
         lists """
-        for subscribers_list in self.get_subscribers(channel):
-            subscriber_to_remove = \
-                list(
-                    filter(lambda x: x.ID == subscriber_id, subscribers_list))[
-                    0]
-            subscribers_list.remove(subscriber_to_remove)
+        subscribers_list = self.get_subscribers(channel)
+        subscriber_to_remove = \
+        list(filter(lambda x: x.ID == subscriber_id, subscribers_list))[0]
+        subscribers_list.remove(subscriber_to_remove)
 
     def _make_generator(self, subscriber):
         """:returns subscriber.ID to identification and
         AsyncIterable(subscriber.queue) to write into response"""
         return (subscriber.ID, AsyncIterable(subscriber.queue))
 
-    def _publish_single(self, data, subscriber):
+    async def _publish_single(self, data, subscriber):
         str_data = str(data)
+        # for line in str_data.split('\n'):
+        #     subscriber.queue.put_nowait('{}\n'.format(line))
         for line in str_data.split('\n'):
-            subscriber.queue.put_nowait('{}\n'.format(line))
-        # subscriber.queue.put_nowait('\n')
+            await subscriber.queue.put('{}\n'.format(line))
 
-    def publish(self, data, channel='default channel'):
+    async def publish(self, data, channel='default channel'):
         for subscriber in self.get_subscribers(channel):
-            self._publish_single(data, subscriber)
+            await self._publish_single(data, subscriber)
 
 
 publisher = Publisher()
@@ -220,13 +221,15 @@ async def subscribe(req, resp):
     finally:
         publisher.unsubscribe(subscriber_id)
         GLED.off()
+        return
 
 
 @app.route("/hello")
 async def hello(req, resp):
     """Handler to work from browser. Makes request to '/subscribe' from
     browser."""
-    publisher.publish("New visit!")  # Message to already connected clients
+    await publisher.publish(
+        "New visit!")  # Message to already connected clients
 
     response = """
 <html>
@@ -256,7 +259,7 @@ async def send_pseudo_id(req, resp):
     if req.qs:
         response = req.qs
     # await sleep(3)
-    publisher.publish(response)  # Message to already connected clients
+    await publisher.publish(response)  # Message to already connected clients
 
     await picoweb.start_response(resp)
     await resp.awrite(response)
@@ -274,7 +277,7 @@ async def reader():
             await eprint(ID)
             await buz.beep(50)
             RLED.on()
-            publisher.publish(ID)
+            await publisher.publish(ID)
 
 
 async def run():
