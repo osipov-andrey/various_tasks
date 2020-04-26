@@ -7,7 +7,7 @@ from uasyncio import sleep, sleep_ms, get_event_loop
 from ucollections import namedtuple
 
 ##################     RFID-READER SETTINGS     ##################
-sse_host = "192.168.10.118"
+sse_host = "10.10.0.1"
 sse_port = 5000
 picoweb_debug = False
 message_to_client = "event: card\ndata: {}\n\n"
@@ -15,6 +15,7 @@ app = picoweb.WebApp("__name__")
 wdt = WDT(timeout=30000)
 buz = Buzzer()
 rfid = RFID()
+max_clients = 2
 
 
 ##################     ####################     ##################
@@ -133,33 +134,33 @@ class Publisher:
         """
         self.subscribers_by_channel = dict()
 
-    def _get_subscribers_lists(self, channel):
-        yield self.subscribers_by_channel.setdefault(channel, [])
-        # списки подписчиков на канал
-
     def get_subscribers(self, channel='default channel'):
-        for subscriber_list in self._get_subscribers_lists(channel):
-            yield from subscriber_list
+        subscribers_list = self.subscribers_by_channel.setdefault(channel, [])
+        return subscribers_list
 
     def subscribe(self, channel='default channel'):
 
         q = Queue(15)
         subscriber = self.Subscriber(id(q), q)  # namedtuple
 
-        for subscribers_list in self._get_subscribers_lists(channel):
+        subscribers_list = self.get_subscribers(channel)
+        if len(subscribers_list) < max_clients:
             subscribers_list.append(subscriber)
-
-        return self._make_generator(subscriber)
+            return self._make_generator(subscriber)
+        else:
+            return (None, None)
 
     def unsubscribe(self, subscriber_id, channel='default channel'):
         """ Finds subscriber by his ID end removes him from subscribers
         lists """
-        for subscribers_list in self._get_subscribers_lists(channel):
+        for subscribers_list in self.get_subscribers(channel):
             subscriber_to_remove = \
-                list(filter(lambda x: x.ID == subscriber_id, subscribers_list))[0]
+                list(
+                    filter(lambda x: x.ID == subscriber_id, subscribers_list))[
+                    0]
             subscribers_list.remove(subscriber_to_remove)
 
-    async def _make_generator(self, subscriber):
+    def _make_generator(self, subscriber):
         """:returns subscriber.ID to identification and
         AsyncIterable(subscriber.queue) to write into response"""
         return (subscriber.ID, AsyncIterable(subscriber.queue))
@@ -183,8 +184,16 @@ async def subscribe(req, resp):
     """ Handler to work with ANT.VERTEX.TEST.CLIENT """
 
     await sleep(0.1)
-    await picoweb.start_response(resp, content_type='text/event-stream')
-    subscriber_id, subscriber_aiterator = await publisher.subscribe()
+
+    subscriber_id, subscriber_aiterator = publisher.subscribe()
+
+    if not subscriber_id:
+        await picoweb.start_response(resp)
+        await resp.awrite('CLIENTS LIST ARE FULL!')
+        return
+
+    else:
+        await picoweb.start_response(resp, content_type='text/event-stream')
 
     try:
         async for data in subscriber_aiterator:
@@ -242,6 +251,7 @@ async def hello(req, resp):
 
 @app.route("/id")
 async def send_pseudo_id(req, resp):
+    print(publisher.subscribers_by_channel)
     response = "B65BBC19"
     if req.qs:
         response = req.qs
