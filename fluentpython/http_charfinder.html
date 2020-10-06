@@ -7,6 +7,9 @@
   <body>
     Examples: {links}
     <p>
+    <scroll-loader :loader-method="getImagesInfo" :loader-enable="loadMore">
+      <div>Loading...</div>
+    </scroll-loader>
       <form action="/">
         <input type="search" name="query" value="{query}">
         <input type="submit" value="find"> {message}

@@ -1,5 +1,6 @@
 import sys
 import asyncio
+import aiohttp_cors
 from aiohttp import web
 
 from charfinder import UnicodeNameIndex
@@ -10,44 +11,58 @@ CONTENT_TYPE = 'text/html'
 SAMPLE_WORDS = ('bismillah chess cat circled Malayalam digit'
                 ' Roman face Ethiopic black mark symbol dot'
                 ' operator Braille hexagram').split()
+LINK_TPL = '/?query={0}'
 
-ROW_TPL = '<tr><td>{code_str}</td><th>{char}</th><td>{name}</td></tr>'
-LINK_TPL = '<a href="/?query={0}" title="find &quot;{0}&quot;">{0}</a>'
-LINKS_HTML = ', '.join(LINK_TPL.format(word) for word in
-                       sorted(SAMPLE_WORDS, key=str.upper))
-
+LINKS_JSON = [
+    {'href': LINK_TPL.format(word), 'text': word}
+    for word in sorted(SAMPLE_WORDS, key=str.upper)
+]
 
 index = UnicodeNameIndex()
-with open(TEMPLATE_NAME) as tpl:
-    template = tpl.read()
-template = template.replace('{links}', LINKS_HTML)
 
 
-# BEGIN HTTP_CHARFINDER_HOME
-def home(request):  # <1>
-    try:
-        query = request.query['query']  # <2>
-        print('Query: {!r}'.format(query))  # <3>
-        descriptions = list(index.find_descriptions(query))
-        res = '\n'.join(ROW_TPL.format(**descr._asdict())
-                        for descr in descriptions)
-        msg = index.status(query, len(descriptions))
-    except KeyError:
-        query = ''
-        descriptions = []
-        res = ''
-        msg = 'Enter words describing characters.'
+class GetExamples(web.View):
 
-    html = template.format(query=query, result=res,  # <5>
-                           message=msg)
-    print('Sending {} results'.format(len(descriptions)))  # <6>
-    return web.Response(content_type=CONTENT_TYPE, text=html) # <7>
-# END HTTP_CHARFINDER_HOME
+    async def get(self):
+        return web.json_response(LINKS_JSON)
+
+
+class GetChars(web.View):
+    chars_cache = dict()
+
+    async def get(self):
+        url_params = self.request.query
+        char_query = url_params['query']
+        page = int(url_params['page'])
+        page_size = int(url_params['per_page'])
+
+        descriptions = self.chars_cache.setdefault(
+            char_query,
+            list(index.find_descriptions(char_query))
+        )
+
+        descriptions_page = descriptions[page * page_size - page_size: page * page_size]
+        res = [descr._asdict() for descr in descriptions_page]
+
+        print('Sending {} results'.format(len(res)))
+        return web.json_response(res)
 
 
 def init_app():
     app = web.Application()
-    app.router.add_route('GET', '/', home)
+    cors = aiohttp_cors.setup(app)
+    resource = cors.add(app.router.add_resource('/'))
+    resource2 = cors.add(app.router.add_resource('/examples'))
+
+    cors.add(resource.add_route("GET", GetChars), {
+        "*":
+            aiohttp_cors.ResourceOptions(allow_credentials=True),
+    })
+    cors.add(resource2.add_route("GET", GetExamples), {
+        "*":
+            aiohttp_cors.ResourceOptions(allow_credentials=True),
+    })
+
     return app
 
 
@@ -58,9 +73,8 @@ def main(address="127.0.0.1", port=8888):
     web.run_app(app, host=address, port=port)
 
     print('Server shutting down.')
-    loop.close()  # <9>
+    loop.close()
 
 
 if __name__ == '__main__':
     main(*sys.argv[1:])
-# END HTTP_CHARFINDER_SETUP
