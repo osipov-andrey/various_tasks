@@ -64,9 +64,21 @@ def generate_linked_list(length=10):
     return LinkedList(first_node)
 
 
+def test(length):
+    linked_list_1 = generate_linked_list(length)
+    list_1 = [str(node) for node in linked_list_1]
+    linked_list_1.reverse()
+    list_2 = [str(node) for node in linked_list_1]
+    for i in range(length):
+        assert list_1[i] == list_2[-1 - i]
+    print(f"Assertion OK for length = {length}")
+
+
 if __name__ == '__main__':
     linked_list = generate_linked_list()
     linked_list.print_list()
     linked_list.reverse()
     print("Reversed: \n")
     linked_list.print_list()
+    for length_ in (0, 1, 10, 19, 10000):
+        test(length_)
