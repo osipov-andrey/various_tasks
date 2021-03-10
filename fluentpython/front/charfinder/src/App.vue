@@ -5,21 +5,14 @@
         <CharForm
             @ask-char="askChar"
         />
-        <div class="images-container">
-          <div v-for="(char, index) of chars" :key="index">
-            <div class="images-card">
-                <p :char="char">{{char.code_str}} <b>{{char.char}}</b> {{char.name}}</p>
-            </div>
-          </div>
-        </div>
-
-        <scroll-loader
-                :loader-method="getCharsInfo"
-                :loader-enable="loadMore"
-                :loader-disable="!loadMore"
-        ></scroll-loader>
-
-        <div class="copyright-container">
+        <MyScrollLoader
+            :loadMore="loadMore"
+            :page="page"
+            :pageSize="pageSize"
+            :chars="chars"
+            :query="query"
+        />
+        <div id="copyright-container">
           <a class="copyright-container__link" href="https://github.com/osipov-andrey">
             <p class="copyright-container__text">By osipov-andrey</p>
           </a>
@@ -30,52 +23,27 @@
 </template>
 
 <script>
-    import axios from 'axios';
 
-    import Vue from 'vue'
-    import ScrollLoader from 'vue-scroll-loader'
     import CharForm from '@/components/CharForm'
     import Examples from '@/components/Examples'
-
-    Vue.use(ScrollLoader)
+    import MyScrollLoader from '@/components/MyScrollLoader'
 
 export default {
         data() {
           return {
             loadMore: false,
             page: 1,
-            pageSize: 20,
+            pageSize: 40,
             chars: [],
-              masks: [],
-              query: ''
+            query: '',
           }
         },
     components: {
         CharForm,
-        Examples
+        Examples,
+        MyScrollLoader
     },
         methods: {
-          getCharsInfo() {
-            axios.get('http://127.0.0.1:8888', {
-                params: {
-                  page: this.page++,
-                  per_page: this.pageSize,
-                    query: this.query
-                }
-              })
-              .then(res => {
-                  console.log(res.data)
-                  res.data && (this.chars = [...this.chars, ...res.data])
-                  // this.images.push(res.data)
-                  console.log(this.chars)
-
-                // Stop scroll-loader
-                res.data.length < this.pageSize && (this.loadMore = false)
-              })
-              .catch(error => {
-                console.log(error);
-              })
-          },
             askChar(char){
                 this.query = char
                 this.chars = []
@@ -84,6 +52,7 @@ export default {
             }
         },
         created() {
+            console.log(this.viewport)
             // if query in query-params - call getCharsInfo
             // This works with examples
             let uri = window.location.search.substring(1);
@@ -91,7 +60,8 @@ export default {
             let query = params.get("query")
             if (query) {
                 this.query = query
-                this.getCharsInfo()
+                this.loadMore = true
+                // this.getCharsInfo()
             }
         }
       }

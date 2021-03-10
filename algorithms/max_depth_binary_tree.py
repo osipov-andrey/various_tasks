@@ -1,3 +1,4 @@
+from queue import Queue
 from typing import Optional
 
 
@@ -38,6 +39,29 @@ class Tree:
 
     def min_depth(self) -> int:
         return self._get_min_or_max_depth(self.root, min)
+
+    def horizontal_traversal(self):
+        queue = Queue()
+        queue.put(self.root)
+        while not queue.empty():
+            node = queue.get()
+            if node.left:
+                queue.put(node.left)
+            if node.right:
+                queue.put(node.right)
+            yield node.value
+
+    def vertical_traversal(self):
+        stack = list()
+        top = self.root
+        while top or stack:
+            if stack:
+                top = stack.pop()
+            while top:
+                yield top.value
+                if top.right:
+                    stack.append(top.right)
+                top = top.left
 
     def is_balanced(self) -> bool:
         return self.max_depth() - self.min_depth() <= 1
@@ -102,7 +126,7 @@ class Tree:
 
 if __name__ == "__main__":
     # TODO: tests
-    values = [3, 2, None]
+    values = [3, 2, 1, 4, 5, 17, 43, 6, 8, None, None, None, None, None, 101]
     root_node = Tree.delinearize(values)
     tree = Tree(root_node)
     print(tree.max_depth())
@@ -111,4 +135,7 @@ if __name__ == "__main__":
 
     linearized_tree = Tree.linearize(root_node)
     print(linearized_tree)
+    print("Horizontal traversal: " + str(list(tree.horizontal_traversal())))
+    print("Vertical traversal: " + str(list(tree.vertical_traversal())))
+    tree.vertical_traversal()
 
